@@ -1,0 +1,4 @@
+1. docker-compose up (Executando todos os serviços configurados)
+
+O caminho mongodb://db/mydb funciona porque, no Docker Compose, os serviços definidos no arquivo docker-compose.yml 
+podem se comunicar entre si usando os nomes dos serviços como nomes de host.

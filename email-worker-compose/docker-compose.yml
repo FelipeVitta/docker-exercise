@@ -1,0 +1,68 @@
+version: '3.9'
+
+volumes:
+  dados: # Volume persistente para o banco de dados
+
+networks:  # Define redes para a comunicação entre containers
+  banco:
+  web:
+  fila: 
+
+services:
+  db:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-1234}  # Utiliza variável de ambiente para a senha do banco
+    volumes:
+      - dados:/var/lib/postgresql/data               # Volume para persistência dos dados
+      - ./scripts:/scripts                           # Scripts de inicialização do banco
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql # Script de inicialização automática
+    networks:
+      - banco
+
+  frontend:
+    image: nginx:1.13
+    volumes:
+      - ./web:/usr/share/nginx/html                  # Monta o diretório do site
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf # Configuração personalizada do NGINX
+    ports:
+      - 80:80                                        # Mapeia a porta 80 do host para o container
+    depends_on:
+      - app                                          # Garante que o serviço app esteja disponível antes de iniciar o frontend
+    networks:
+      - web
+
+  app:
+    image: python:3.6
+    volumes:
+      - ./app:/app                                   # Monta o diretório da aplicação
+    working_dir: /app                                # Define o diretório de trabalho
+    command: bash ./app.sh                           # Executa o script de inicialização da aplicação                                     # Expõe a porta para permitir que o frontend se conecte
+    networks:
+      - banco
+      - web
+      - fila
+    depends_on:
+      - db
+      - queue
+    environment:
+      - DB_NAME=email_sender
+
+  queue:
+    image: redis:3.2
+    networks:
+      - fila
+  
+  worker:
+    build: worker
+    volumes:
+    # Worker  
+    - ./worker:/worker
+    working_dir: /worker
+    command: worker.py
+    networks:
+      - fila
+    depends_on:
+      - queue
+
+

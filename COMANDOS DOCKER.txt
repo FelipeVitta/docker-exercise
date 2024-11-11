@@ -1,0 +1,229 @@
+DEFINIÇÕES:
+
+-> Um container é uma unidade de software que empacota o código e todas as suas dependências para que um aplicativo possa ser executado de forma rápida e confiável em diferentes ambientes de computação.
+
+-> Os containers fornecem um ambiente isolado para a execução de aplicativos, similar a uma máquina virtual, mas mais leve.
+Eles compartilham o kernel do sistema operacional do host, mas têm seu próprio espaço de usuário, rede e sistema de arquivos.
+
+-> Os containers são mais eficientes em termos de recursos do que as máquinas virtuais porque não precisam incluir um sistema operacional completo.
+Eles inicializam rapidamente e utilizam menos memória e CPU.
+
+-> Uma imagem de container é um arquivo estático, imutável, que contém o código, as bibliotecas, as dependências e o runtime necessários para executar um aplicativo.
+As imagens são armazenadas em registros (ex: Docker Hub) e podem ser versionadas.
+
+-> Containers são instâncias de execução das imagens de container.
+Vários containers podem ser executados a partir de uma única imagem, cada um funcionando de forma independente.
+
+-> A abordagem mais interessante usando o docker é criar um container para cada serviço da sua aplicação (front-end, back-end, banco de dados, etc)
+
+-> Ferramentas como Docker são usadas para criar, gerenciar e orquestrar containers.
+Docker Compose permite a definição e execução de aplicativos multi-container.
+Kubernetes e Docker Swarm são usados para orquestração de containers em larga escala, gerenciando clusters de hosts de containers.
+
+-> Analogia: imagem = classe | container = instancia (objeto)
+
+=> TAGS: são ponteiros para imagens específicas (hash específicas). É possível ter várias tags apontando para o mesmo hash
+
+ - Tags também são maneiras de identificar versões específicas de uma imagem Docker.
+ - Tags podem ser entendidas como apelidos, também.
+
+=> Diferença de Docker Hub e Docker Registry:
+
+ - Docker Registry -> Serviço para registro e obtenção de imagem. É possível ter um registry privado para a própria empresa, por exemplo. Disponibiliza uma API para
+   publicar imagens ou baixar imagens de um registry.
+ - Docker Hub -> Produto na nuvem disponibilizado pelo Docker (dentro do docker hub existe um registry) que contem uma interface gráfica e outras funcionalidades
+   que um registry normal não tem. Por exemplo, existem imagens oficiais geradas pelo time do próprio docker, que são bem confiáveis. SAAS (software as a service)
+
+=> LAYERS:
+
+  - Uma layer (camada) é uma parte de uma imagem. Cada imagem Docker é construída a partir de uma série de camadas que se empilham para formar a imagem final.
+  - Imagem Base: A primeira camada de uma imagem é normalmente uma "imagem base", como o nginx:latest ou ubuntu:latest. Essa camada contém o sistema de arquivos de um ambiente básico 
+   (por exemplo, um servidor web NGINX ou uma distribuição Linux). Cada instrução em um Dockerfile (como RUN, COPY, ADD, etc.) cria uma nova camada.
+
+=> VOLUME:
+   - É uma área de aramazenamento persistente que é gerenciada pelo Docker e pode ser utilizada por containers para armazenar dados.
+   - Os volumes persistem independentemente do ciclo de vida dos containers
+   - Quando um container Docker é parado ou removido, todos os dados que não estão vinculados a um volume ou não estão montados em um diretório externo ao container são perdidos. 
+
+-> LOGIN NO DOCKER PELO TERMINAL:
+  - docker login --username=felipevitta
+
+=> DOCKER COMPOSE:
+  - Ferramenta que permite definir e gerenciar aplicações multi-container no Docker de forma simplificada, usando um arquivo yaml (docker-compose.yaml). Nesse arquivo
+  você descreve os serviços, redes e volumes que compôem a aplicação, facilitando a orquestração de diversos containers. Ele pode startar todos os containers de forma
+  coordenada que pertencem a sua aplicação.
+
+
+COMANDOS DOCKER:
+
+docker container run: Cria e inicia um novo container.
+docker container ls: Lista todos os containers em execução.
+docker ps -a: Lista todos os containers.
+docker container stop [ID|NOME]: Para um container em execução.
+docker container start [ID|NOME]: Inicia um container parado.
+docker container rm [ID|NOME]: Remove um ou mais containers.
+docker container inspect [ID|NOME]: Mostra os detalhes de um container.
+docker container logs [ID|NOME]: Mostra os logs de um container.
+docker container exec [ID|NOME] [COMANDO]: Executa um comando em um container em execução.
+docker container run --net [NETWORK] [IMAGEM]: Criar e inicia um novo container com uma network especifica
+
+docker image build -t [TAG] [DIRETÓRIO]: Constrói uma nova imagem Docker a partir de um Dockerfile.
+docker image ls: Lista todas as imagens.
+docker image rm [IMAGEM]: Remove uma ou mais imagens.
+docker image tag [IMAGEM] [NOVA_TAG]: Marca uma imagem com uma nova tag. (EX: docker image tag redis:latest cod3r-redis)
+docker image pull [IMAGEM]: Baixa uma imagem de um repositório.
+docker image push [IMAGEM]: Envia uma imagem para um repositório. (Ex: docker image push felipevitta/simple-build:1.0)
+
+docker volume create [NOME]: Cria um novo volume.
+docker volume ls: Lista todos os volumes.
+docker volume rm [VOLUME]: Remove um ou mais volumes.
+docker volume inspect [VOLUME]: Mostra os detalhes de um volume.
+
+docker network create [NOME]: Cria uma nova rede.
+docker network ls: Lista todas as redes.
+docker network rm [REDE]: Remove uma ou mais redes.
+docker network inspect [REDE]: Mostra os detalhes de uma rede.
+docker network connect [REDE] [CONTAINER]: Conecta um container a uma rede.
+docker network disconnect [REDE] [CONTAINER]: Desconecta um container de uma rede.
+
+docker-compose up: Inicia e executa os containers definidos no arquivo docker-compose.yml.
+docker-compose down: Para e remove os containers, redes e volumes definidos no arquivo docker-compose.yml.
+docker-compose build: Constrói ou reconstrói os serviços definidos no arquivo docker-compose.yml.
+docker-compose logs: Mostra os logs dos serviços definidos no arquivo docker-compose.yml.
+docker-compose ps: Lista os containers em execução definidos no arquivo docker-compose.yml.
+
+docker system df: Mostra o espaço em disco usado pelo Docker.
+docker system prune: Remove todos os containers, volumes, redes e imagens não utilizados.
+docker system info: Mostra informações detalhadas sobre o sistema Docker.
+
+FLAGS:
+
+1. -d, --detach
+Descrição: Roda um container em segundo plano (background) e imprime o ID do container.
+Exemplo: docker run -d nginx
+
+2. -p, --publish
+Descrição: Mapeia uma porta do host para uma porta do container.
+Exemplo: docker run -p 8080:80 nginx
+
+3. --name
+Descrição: Nomeia um container.
+Exemplo: docker run --name my_nginx nginx
+
+4. -e, --env
+Descrição: Define variáveis de ambiente.
+Exemplo: docker run -e MYVAR=myvalue nginx
+
+5. -v, --volume
+Descrição: Mapeia volumes ou diretórios do host para o container.
+Exemplo: docker run -v /host/data:/container/data nginx
+
+6. -it
+Descrição: Combina -i (interativo) e -t (pseudo-TTY) para executar o container de forma interativa.
+Exemplo: docker run -it ubuntu bash
+
+7. -c
+Descrição: permite que você execute um comando específico a partir de uma string.
+Exemplo: docker container run alpine ash -c "ifconfig"
+
+7. --rm
+Descrição: Remove automaticamente o container quando ele para.
+Exemplo: docker run --rm nginx
+
+8. --network
+Descrição: Conecta o container a uma rede específica.
+Exemplo: docker run --network my_network nginx
+
+9. --restart
+Descrição: Define a política de reinicialização para o container (no, on-failure, always, unless-stopped).
+Exemplo: docker run --restart unless-stopped nginx
+
+10. -u, --user
+Descrição: Especifica o usuário (UID) que o container deve usar.
+Exemplo: docker run -u 1000 nginx
+
+11. --entrypoint
+Descrição: Override the default ENTRYPOINT of the image.
+Exemplo: docker run --entrypoint /bin/bash nginx
+
+12. --log-driver
+Descrição: Especifica o driver de log a ser usado (json-file, syslog, etc.).
+Exemplo: docker run --log-driver=syslog nginx
+
+13. --cpus
+Descrição: Limita a quantidade de CPUs que o container pode usar.
+Exemplo: docker run --cpus="2.5" nginx
+
+14. --memory
+Descrição: Limita a quantidade de memória que o container pode usar.
+Exemplo: docker run --memory="512m" nginx
+
+15. --gpus
+Descrição: Define a quantidade de GPUs que o container pode usar.
+Exemplo: docker run --gpus all nvidia/cuda:10.0-base
+
+16. --privileged
+Descrição: Concede ao container acesso a todos os dispositivos do host.
+Exemplo: docker run --privileged nginx
+
+17. --device
+Descrição: Adiciona um dispositivo do host ao container.
+Exemplo: docker run --device=/dev/sda:/dev/xvda nginx
+
+18. -t
+Descrição: Usada para atribuir um nome e uma tag a uma imagem Docker no momento em que ela é criada
+Exemplo: docker image build -t ex-simple-build .
+
+
+Exemplos de comandos na prática:
+
+docker container run -d -p 6379:6379 cod3r-redis
+- Roda o container em segundo plano com o (-d). Mapeia a porta 6379 do host para a porta 6379 do contêiner. Inicia a imagem cod3r-redis.
+
+docker image build -t ex-simple-build .
+- Construindo uma nova imagem docker com a tag ex-simple-build no diretório atual (.) a partir de um Dockerfile
+
+docker exec -it python-server /bin/bash 
+- Abre um terminal dentro do container já em execução
+
+docker image tag ex-simple-build felipevitta/simple-build:1.0
+- Criando uma nova tag para uma imagem e setando uma versão especifica (1.0)
+
+
+TIPOS DE REDE EM DOCKER:
+
+  => Bridge: 
+    - Rede padrão usada quando você inicia contaners sem especificar uma rede
+    - Containers estão em um rede separada da do host. É criada uma rede virtual interna. (Semelhante a VLAN).
+    - Cada contêiner na rede bridge recebe um endereço IP que permite a comunicação entre os contêineres na mesma rede.
+    - Para acessar os contêineres de fora da rede, você pode expor portas do contêiner.
+    - OBS: quando há vário containers de serviços e pessoas diferentes, são criadas várias redes bridges.
+
+  => Host Network:
+    - Nesse modo, o contêiner compartilha a rede do host diretamente. Ou seja, o contêiner não tem sua própria pilha de rede isolada.
+    - Isso permite ao contêiner usar a mesma interface de rede que o host, facilitando o acesso a serviços no host e reduzindo a latência na comunicação.
+    - Não há necessidade de mapeamento de portas, pois o contêiner já está diretamente exposto à rede do host.
+
+  => None (Sem Rede):
+    - Quando você especifica a rede como none, o contêiner não terá acesso a nenhuma rede.
+    - Ele não estará conectado a outras redes nem terá interfaces de rede conectadas, mas ainda pode interagir com volumes e usar o sistema de arquivos.
+  
+  => Overlay Network (Rede em Overlay):
+    - Usada principalmente em ambientes de orquestração (como Docker Swarm e Kubernetes), onde múltiplos hosts Docker estão envolvidos.
+    - Permite que contêineres em hosts diferentes se comuniquem como se estivessem na mesma rede local.
+    - É usada para conectar serviços de forma distribuída em um cluster.
+
+    Criando uma nova rede (tipo bridge):
+    - docker network create --driver bridge rede_nova
+
+    Executando comando para ver ip do container:
+    - docker container run -it --rm --name container_teste --net rede_nova alpine ash -c ifconfig
+
+    Conectando a nova rede criada a rede bridge padrão:
+    - docker network connect bridge container3 (agora o container3 passa a ter 2 interfaces, a da sua propria rede e a da rede bridge)
+
+    Desconectar a rede bridge:
+    - docker network disconnect bridge container3 (a segunda interface do container3 some)
+
+    
+

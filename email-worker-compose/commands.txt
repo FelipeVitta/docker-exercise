@@ -1,0 +1,12 @@
+
+docker-compose up -d (iniciar o compose)
+docker-compose exec db psql -U postgres -c '\l' (listando os bancos de dados dentro da instância ativa)
+docker-compose down
+docker-compose exec db psql -U postgres -f /scripts/check.sql (rodando o check.sql dentro da pasta scripts do container) [-f = file] [-U = user]
+
+docker-compose exec db psql -U postgres -d email_sender -c 'SELECT * FROM EMAILS'
+
+docker-compose down -v  (remove os volumes persistidos)
+
+docker-compose up -d --scale worker=3 (RODANDO 3 INSTANCIAS DO SERVIÇOS COM NOME "worker")
+

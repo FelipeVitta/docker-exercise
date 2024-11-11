@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro Simples</h1>
+        <hr>
+        <div>
+          <input name="id" type="hidden" />
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input class="form-control" name="name" placeholder="Digite o nome" />
+          </div>
+          <button class="btn btn-success" save>Salvar</button>
+        </div>
+      
+        <table class="table" id="clients">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="clientsRows"></tbody>
+        </table>
+      </div>
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script>
+        const API = 'http://localhost:3000'
+
+        const createButton = (label, type) =>{
+            return $('<button>').addClass(`btn btn-${type}`).html(label)
+        }
+
+        const renderRows = clients => {
+            const rows = clients.map(client => {
+                const removeButton = createButton('Excluir', 'danger')
+                removeButton.click(() => removeClient(client))
+                return $('<tr>').append($('<td>').append(client.name)).append($('<td>').append(removeButton))
+            })
+            $('#clientsRows').html(rows);
+        }
+
+        const removeClient = (client) => {
+            fetch(`${API}/clients/${client._id}`, { method: 'DELETE' }) // Use _id ou id de acordo com a estrutura
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao remover o cliente');
+                    }
+                    return response.json(); // Se a API retornar algum JSON após a remoção (geralmente uma mensagem de sucesso)
+                })
+                .then(() => {
+                    console.log('Cliente removido com sucesso');
+                    getClients(); // Atualiza a lista de clientes
+                })
+                .catch(error => {
+                    console.error('Erro:', error); // Captura e exibe qualquer erro
+                });
+        };
+
+        const getClients = () => {
+            fetch(`${API}/clients`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar os clientes');
+                    }
+                    return response.json(); // Converte o retorno para JSON
+                })
+                .then(clients => {
+                    renderRows(clients);
+                })
+                .catch(error => {
+                    console.error('Erro:', error); // Captura e exibe qualquer erro
+                });
+        };
+
+        const saveClient = () => {
+            const id = $('[name=id]').val(); // Obtém o valor do campo 'id'
+            const name = $('[name=name]').val(); // Obtém o valor do campo 'name'
+            
+            fetch(`${API}/clients`, {
+                method: 'POST', // Define o método como POST
+                headers: {
+                    'Content-Type': 'application/json' // Define o tipo de conteúdo como JSON
+                },
+                body: JSON.stringify({ name, id }) // Envia os dados do cliente no corpo da requisição
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao salvar o cliente');
+                }
+                getClients(); // atualizando a lista de clientes
+                return response.json();
+            })
+            .then(client => {
+                console.log('Cliente salvo com sucesso:', client); // Manipula a resposta do servidor
+            })
+            .catch(error => {
+                console.error('Erro ao salvar o cliente:', error); // Lida com os erros
+            });
+        };
+
+        window.onload = () =>{
+            getClients()
+        }
+
+        const buttonSave = $('[save]');
+        buttonSave.on('click', () => {
+            saveClient();
+        });
+        
+      </script>    
+</body>
+</html>
